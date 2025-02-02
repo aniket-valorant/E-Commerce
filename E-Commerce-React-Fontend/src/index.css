@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+body{
+    background-color: #f1f3f6;
+}
+
+.home-section-card{
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
