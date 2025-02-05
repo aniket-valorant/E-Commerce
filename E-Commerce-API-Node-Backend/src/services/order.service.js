@@ -1,6 +1,6 @@
 const Address = require("../model/address.model.js");
 const Order = require("../model/order.model.js");
-const OrderItem = require("../model/orderItems.js");
+const OrderItem = require("../model/orderItems.model.js");
 const cartService = require("../services/cart.service.js");
 
 async function createOrder(user, shippAddress) {

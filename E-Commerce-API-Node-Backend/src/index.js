@@ -1,8 +1,8 @@
 const express = require('express')
 const cors = require('cors')
 const app = express()
-const authRouters = require("./routes/auth.route.js")
-const userRouters = require("./routes/user.route.js")
+const authRouters = require("./routes/auth.routes.js")
+const userRouters = require("./routes/user.routes.js")
 
 app.use(express.json())
 app.use(cors())
