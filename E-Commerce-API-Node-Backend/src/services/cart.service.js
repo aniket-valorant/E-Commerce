@@ -61,6 +61,8 @@ async function addCartItem (userId, req) {
          cart.cartItems.push(createdCartItem);
          await cart.save();
          return "Item added to cart"
+      } else {
+        return "Item Already Added in the cart"
       }
 
   } catch (error) {

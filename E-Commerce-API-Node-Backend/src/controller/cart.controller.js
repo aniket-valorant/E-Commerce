@@ -4,9 +4,9 @@ const findUserCart = async (req, res)=> {
     const  user = req.user;
     try {
         const cart = await cartService.findUserCart(user._id);
-        return res.status(200).sent(cart);
+        return res.status(200).send(cart);
     } catch (error) {
-        return res.status(500).sent({err: error.message})
+        return res.status(500).send({err: error.message,mes:" this"})
     }
 }
 
@@ -14,9 +14,9 @@ const addItemToCart = async (req, res)=> {
     const  user = req.user;
     try {
         const cartItem = await cartService.addCartItem(user._id, req.body);
-        return res.status(200).sent(cartItem);
+        return res.status(200).send(cartItem);
     } catch (error) {
-        return res.status(500).sent({err: error.message})
+        return res.status(500).send({err: error.message})
     }
 }
 

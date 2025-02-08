@@ -4,35 +4,36 @@ const mongoose = require("mongoose");
 const addressSchema = new mongoose.Schema({
     firstName: {
         type: String,
-        // required: true,
+        required: true,
     },
     lastName: {
         type: String,
-        // required: true,
+        required: true,
     },
     streetAddress: {
         type: String,
-        // required: true,
+        required: true,
     },
     city: {
         type: String,
-        // required: true,
+        required: true,
     },
     state: {
         type: String,
-        // required: true,
+        required: true,
     },
     zipcode: {
         type: Number,
-        // required: true,
+        required: true,
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "users",
+        required: true,
     },
     mobile: {
         type: String,
-        // required: true,
+        required: true,
     },
 });
 

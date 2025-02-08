@@ -3,67 +3,68 @@ const { Schema } = mongoose;
 
 // order Schema
 const orderSchema = new Schema({
-    user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "users",
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "users",
+  },
+  orderItems: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "orderItems",
     },
-    orderItems: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "orderItems",
+  ],
+  orderDate: {
+    type: Date,
+    required: true,
+    default: Date.now(),
+  },
+  deliveryDate: {
+    type: Date,
+  },
+  shippingAddress: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "addresses",
+  },
+  paymentDetails: {
+    paymentMethod: {
+      type: String,
     },
-    orderDate: {
-        type: Date,
-        required: true,
-        default: Date.now(),
+    transactionId: {
+      type: String,
     },
-    deliveryDate: {
-        type: Date
+    paymentId: {
+      type: String,
     },
-    shippingAddress: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "addresses",
+    paymentStatus: {
+      type: String,
+      default: "PENDING",
     },
-    paymentDetails: {
-
-        paymentMethod: {
-            type: String,
-        },
-        transactionId: {
-            type: String,
-        },
-        paymentId: {
-            type: String,
-        },
-        paymentStatus: {
-            type: String,
-            default: "PENDING",
-        },
-    },
-    totalPrice: {
-        type: Number,
-        required: true,
-    },
-    totalDiscountPrice: {
-        type: Number,
-        required: true,
-    },
-    discounte: {
-        type: Number,
-        required: true,
-    },
-    orderStatus: {
-        type: String,
-        required: true,
-        default: "PENDING"
-    },
-    totalItem: {
-        type: Number,
-        required: true,
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now(),
-    },
+  },
+  totalPrice: {
+    type: Number,
+    required: true,
+  },
+  totalDiscountPrice: {
+    type: Number,
+    required: true,
+  },
+  discounte: {
+    type: Number,
+    required: true, 
+  },
+  orderStatus: {
+    type: String,
+    required: true,
+    default: "PENDING",
+  },
+  totalItem: {
+    type: Number,
+    required: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now(),
+  },
 });
 
 // table for this schema
