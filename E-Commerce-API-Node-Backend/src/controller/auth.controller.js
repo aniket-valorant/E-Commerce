@@ -12,7 +12,7 @@ const register = async (req, res) => {
 
     return res.status(200).send({ jwt, message: "Register success" });
   } catch (e) {
-    return res.status(500).send({error: e.message});
+    return res.status(500).send(e);
   }
 };
 

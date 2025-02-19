@@ -33,9 +33,9 @@ export const filters = [
     id: "size",
     name: "Size",
     options: [
-      { value: "s", label: "S" },
-      { value: "m", label: "M" },
-      { value: "l", label: "L" },
+      { value: "S", label: "S" },
+      { value: "M", label: "M" },
+      { value: "L", label: "L" },
     ],
   },
 ];

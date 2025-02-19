@@ -11,11 +11,11 @@ import OrderSummary from "./OrderSummary";
 const steps = ["Login", "Delivery Address", "Order Summary", "Payment"];
 
 export default function Checkout() {
-  const [activeStep, setActiveStep] = React.useState(0);
   const location = useLocation();
   const querySearch = new URLSearchParams(location.search);
+  const step = querySearch.get("step") || 0;
+  const [activeStep, setActiveStep] = React.useState(parseInt(step));
 
-  const step = querySearch.get("step");
 
   return (
     <div className="px-10  lg:px-20">
@@ -40,7 +40,7 @@ export default function Checkout() {
           </React.Fragment>
         ) : (
           <React.Fragment>
-            <div>{step == 2 ? <DeliveryAddressForm /> : <OrderSummary />}</div>
+            <div>{parseInt(step) == 2 ? <DeliveryAddressForm /> : <OrderSummary />}</div>
           </React.Fragment>
         )}
       </Box>

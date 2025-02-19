@@ -5,49 +5,57 @@ const cartService = require("../services/cart.service.js");
 
 async function createOrder(user, shippAddress) {
   let address;
+  
+  try {
+    if (shippAddress._id) {
+      address = await Address.findById(shippAddress._id);
+    } else {
+      address = new Address(shippAddress);
+      address.user = user;
 
-  if (shippAddress._id) {
-    let existAddress = await Address.findById(shippAddress._id);
-    address = existAddress;
-  } else {
-    address = new Address(shippAddress);
-    address.user = user;
-    await address.save();
-    user.address.push(address);
-    await user.save();
+      await address.save();
+      user.address.push(address);
+      await user.save();
+    }
+  } catch (error) {
+    console.error("Error Saving Address:", error);
+    throw new Error("Error Saving Address: " + error.message);
   }
 
+  // Fetch user cart
   const cart = await cartService.findUserCart(user._id);
-  const orderItems = [];
-
-  for (let item of cart.cartItems) {
-    const orderItem = new OrderItem({
-      price: item.price,
-      product: item.product,
-      quantity: item.quantity,
-      size: item.size,
-      discountedPrice: item.discountedPrice,
-      userId: item.userId,
-    });
-
-    const createdOrderItem = await orderItem.save();
-    orderItems.push(createdOrderItem);
-
-    const createdOrder = new Order({
-      user,
-      orderItems,
-      shippingAddress: address,
-      totalPrice: cart.totalPrice,
-      totalDiscountPrice: cart.totalDiscountedPrice,
-      totalItem: cart.totalItem,
-      discounte: cart.discounte
-    });
-
-    const savedOrder = await createdOrder.save();
-    return savedOrder;
+  if (!cart || cart.cartItems.length === 0) {
+    throw new Error("Cart is empty, cannot create order.");
   }
-}
 
+  // Create order items concurrently
+  const orderItems = await Promise.all(
+    cart.cartItems.map(async (item) => {
+      const orderItem = new OrderItem({
+        price: item.price,
+        product: item.product,
+        quantity: item.quantity,
+        size: item.size,
+        discountedPrice: item.discountedPrice,
+        userId: item.userId,
+      });
+      return await orderItem.save();
+    })
+  );
+
+  // Create order after all order items are saved
+  const createdOrder = new Order({
+    user,
+    orderItems,
+    shippingAddress: address,
+    totalPrice: cart.totalPrice,
+    totalDiscountPrice: cart.totalDiscountedPrice,
+    totalItem: cart.totalItem,
+    discounte: cart.discounte,
+  });
+
+  return await createdOrder.save(); // Save and return the order
+}
 async function placeOrder(orderId) {
   const order = await findOrderById(orderId);
   order.orderStatus = "PLACED";
@@ -119,21 +127,20 @@ async function getAllOrders() {
   }).lean;
 }
 
-
 async function deleteOrder(orderId) {
-    const order = await findOrderById(orderId);
-    await Order.findByIdAndDelete(order._id)
+  const order = await findOrderById(orderId);
+  await Order.findByIdAndDelete(order._id);
 }
 
 module.exports = {
-    createOrder,
-    placeOrder,
-    confirmOrder,
-    shipOrder,
-    deliverOrder,
-    cancleOrder,
-    findOrderById,
-    deleteOrder,
-    getAllOrders,
-    userOrderHistory
-}
+  createOrder,
+  placeOrder,
+  confirmOrder,
+  shipOrder,
+  deliverOrder,
+  cancleOrder,
+  findOrderById,
+  deleteOrder,
+  getAllOrders,
+  userOrderHistory,
+};

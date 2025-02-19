@@ -1,6 +1,5 @@
 "use client";
-import { Fragment, useState } from "react";
-import AccountBoxIcon from "@mui/icons-material/AccountBox";
+import { Fragment, useEffect, useState } from "react";
 import LocalOfferTwoToneIcon from "@mui/icons-material/LocalOfferTwoTone";
 import React from "react";
 import {
@@ -23,8 +22,12 @@ import {
   ShoppingBagIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { Navigate, useNavigate } from "react-router-dom";
-import { Button, Menu, MenuItem } from "@mui/material";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
+import { Avatar, Button, Menu, MenuItem } from "@mui/material";
+import AuthModel from "../../Auth/AuthModel";
+import { useDispatch, useSelector } from "react-redux";
+import { getUser, logout } from "../../../State/Auth/Action";
+import { deepPurple } from "@mui/material/colors";
 
 const navigation = {
   categories: [
@@ -157,12 +160,27 @@ const navigation = {
 };
 
 const Navigation = () => {
-  const [open, setOpen] = useState(false);
   const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+  const [openAuth, setOpenAuth] = useState(false);
+  const jwt = localStorage.getItem("jwt");
+  const location = useLocation();
+  const { auth } = useSelector((store) => store);
+  const dispatch = useDispatch();
+
+  const handleAuthOpen = () => {
+
+    setOpenAuth(true);
+  };
+
+  const handleAuthClose = () => {
+
+    setOpenAuth(false);
+  };
 
   const handleCategoryClick = (category, section, item, close) => {
     navigate(`/${category.id}/${section.id}/${item.name}`);
-    close();
+    // close();
   };
 
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -170,17 +188,41 @@ const Navigation = () => {
   const handleAccClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleClose = () => {
     setAnchorEl(null);
   };
 
+
   const handleMyOrder = () => {
-    navigate("/account/order")
-    setAnchorEl(null);
+    navigate("/account/order");
+    handleClose()
   };
 
+  
+
+  useEffect(() => {
+    if (jwt ) {
+      dispatch(getUser(jwt)); 
+    }
+  }, [jwt, auth.jwt]);
+
+  useEffect(() => {
+    if (auth.user) {
+      handleAuthClose();
+    }
+    if (location.pathname === "/login" || location.pathname === "/register") {
+      navigate(-1);
+    }
+  }, [auth.user]);
+
+  const handleLogout = () => {
+      dispatch(logout());
+      handleClose()
+  }
+
   return (
-    <div className="bg-white mb-10">
+    <div className="bg-white pb-10">
       {/* Mobile menu */}
       <Dialog open={open} onClose={setOpen} className="relative z-40 lg:hidden">
         <DialogBackdrop
@@ -472,30 +514,44 @@ const Navigation = () => {
                     href="#"
                     className="text-sm font-medium text-gray-700 hover:text-gray-800"
                   >
-                    <div>
+                    {auth.user?.firstName ? (
+                      <div>
+                        <Avatar
+                          className="text-white"
+                          onClick={handleAccClick}
+                          aria-controls={accOpen ? "basic-menu" : undefined}
+                          aria-haspopup="true"
+                          aria-expanded={accOpen ? "true" : undefined}
+                          sx={{
+                            bgcolor: deepPurple[500],
+                            color: "white",
+                            cursor: "pointer",
+                          }}
+                        >
+                          {auth.user?.firstName.slice(0, 2).toUpperCase()}
+                        </Avatar>
+                        <Menu
+                          id="basic-menu"
+                          anchorEl={anchorEl}
+                          open={accOpen}
+                          onClose={handleClose}
+                          MenuListProps={{
+                            "aria-labelledby": "basic-button",
+                          }}
+                        >
+                          <MenuItem onClick={handleClose}>Profile</MenuItem>
+                          <MenuItem onClick={handleMyOrder}>My Orders</MenuItem>
+                          <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                        </Menu>
+                      </div>
+                    ) : (
                       <Button
-                        id="account-button"
-                        aria-controls={accOpen ? "basic-menu" : undefined}
-                        aria-haspopup="true"
-                        aria-expanded={accOpen ? "true" : undefined}
-                        onClick={handleAccClick}
+                        onClick={handleAuthOpen}
+                        className="text-sm font-medium text-gray-700 hover:text-gray-800"
                       >
-                        <AccountBoxIcon fontSize="large" />
+                        Sign In
                       </Button>
-                      <Menu
-                        id="basic-menu"
-                        anchorEl={anchorEl}
-                        open={accOpen}
-                        onClose={handleClose}
-                        MenuListProps={{
-                          "aria-labelledby": "basic-button",
-                        }}
-                      >
-                        <MenuItem onClick={handleClose}>Profile</MenuItem>
-                        <MenuItem onClick={handleMyOrder}>My Orders</MenuItem>
-                        <MenuItem onClick={handleClose}>Logout</MenuItem>
-                      </Menu>
-                    </div>
+                    )}
                     {/* Sign in */}
                   </a>
                   {/* <span aria-hidden="true" className="h-6 w-px bg-gray-200" />
@@ -551,6 +607,7 @@ const Navigation = () => {
           </div>
         </nav>
       </header>
+      <AuthModel open={openAuth} handleClose={handleAuthClose} />
     </div>
   );
 };

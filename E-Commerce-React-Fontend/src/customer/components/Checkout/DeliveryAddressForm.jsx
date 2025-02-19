@@ -1,8 +1,15 @@
 import { Box, Button, Grid, TextField } from "@mui/material";
 import React from "react";
 import AddressCard from "../AddressCard/AddressCard";
+import { useDispatch } from "react-redux";
+import { createOrder } from "../../../State/Order/Acton";
+import { useNavigate } from "react-router-dom";
 
 const DeliveryAddressForm = () => {
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+
+
 
   const handleSubmit = (e)=> {
     e.preventDefault()
@@ -12,12 +19,18 @@ const DeliveryAddressForm = () => {
       lastName:data.get('lastName'),
       streetAddress:data.get('address'),
       city:data.get('city'),
-      pincode:data.get('pincode'),
+      zipcode:data.get('pincode'),
       state:data.get('state'),
-      mobileNumber:data.get('mobileNumber'),
+      mobile:data.get('mobileNumber'),
     }
-
-    console.log("Address: ", address)
+    const orderData = {address, navigate}
+    try {
+      dispatch(createOrder(orderData));
+      console.log("Data is",)
+    } catch (error) {
+      console.error("Order creation failed:", error);
+      alert("Failed to place order. Please try again.");
+    }
   }
 
   return (
@@ -119,7 +132,7 @@ const DeliveryAddressForm = () => {
                   sx={{ mt: 2, px: 10, py: 1, bgcolor: "rgb(14 85 253)" }}
                   type="submit"
                 >
-                  Add
+                  Deliver Here
                 </Button>
               </div>
             </form>

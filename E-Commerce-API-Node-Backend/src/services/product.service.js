@@ -10,7 +10,7 @@ async function createProduct(reqData) {
       name: reqData.topLevelCategory,
       level: 1,
     });
-    await topLevel.save()
+    await topLevel.save();
   }
 
   let secondLevel = await Category.findOne({
@@ -24,9 +24,8 @@ async function createProduct(reqData) {
       parentCategory: topLevel._id,
       level: 2,
     });
-    await secondLevel.save()
+    await secondLevel.save();
   }
-
 
   let thirdLevel = await Category.findOne({
     name: reqData.thirdLevelCategory,
@@ -39,19 +38,19 @@ async function createProduct(reqData) {
       parentCategory: secondLevel._id,
       level: 3,
     });
-    await thirdLevel.save()
-
+    await thirdLevel.save();
   }
 
   const product = new Product({
     title: reqData.title,
+    brand: reqData.brand,   
     color: reqData.color,
     description: reqData.description,
     discountedPrice: reqData.discountedPrice,
     discountPercent: reqData.discountPercent,
     imageUrl: reqData.imageUrl,
     price: reqData.price,
-    size: reqData.sizes,
+    size: reqData.size,
     quantity: reqData.quantity,
     category: thirdLevel._id,
   });
@@ -85,7 +84,7 @@ async function getAllProducts(reqQuery) {
   let {
     category,
     color,
-    sizes,
+    size,
     minPrice,
     maxPrice,
     minDiscount,
@@ -113,14 +112,14 @@ async function getAllProducts(reqQuery) {
       color.split(",").map((color) => color.trim().toLowerCase())
     );
 
-    const colorRegex =
-      colorSet > 0 ? new RegExp([...colorSet].join("|"), "i") : null;
-
-    query = query.where("color").regex(colorRegex);
+    if (colorSet.size > 0) {
+      const colorRegex = new RegExp([...colorSet].join("|"), "i");
+      query = query.where("color").regex(colorRegex);
+    }
   }
 
-  if (sizes) {
-    const sizesSet = new Set(sizes);
+  if (size) {
+    const sizesSet = new Set(size);
     query = query.where("size.name").in([...sizesSet]);
   }
 
@@ -146,7 +145,6 @@ async function getAllProducts(reqQuery) {
   }
 
   const totalProducts = await Product.countDocuments(query);
-
   const skip = (pageNumber - 1) * pageSize;
   query = query.skip(skip).limit(pageSize);
   const products = await query.exec();

@@ -1,10 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Radio, RadioGroup } from "@headlessui/react";
 import { Box, Button, Grid, LinearProgress, Rating } from "@mui/material";
 import ProductReviewCard from "./ProductReviewCard";
 import { mens_kurta } from "../../../Data/Mens_kurta";
 import HomeSectionCard from "../HomeSectionCards/HomeSectionCard";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { findProductsById } from "../../../State/Product/Action";
+import { addItemToCart } from "../../../State/Cart/Action";
 
 const product = {
   name: "Basic Tee 6-Pack",
@@ -16,19 +19,19 @@ const product = {
   ],
   images: [
     {
-      src: "https://tailwindui.com/plus/img/ecommerce-images/product-page-02-secondary-product-shot.jpg",
+      src: "https://m.media-amazon.com/images/I/51j2mBT8iiL.jpg",
       alt: "Two each of gray, white, and black shirts laying flat.",
     },
     {
-      src: "https://tailwindui.com/plus/img/ecommerce-images/product-page-02-tertiary-product-shot-01.jpg",
+      src: "https://m.media-amazon.com/images/I/51zEcB8S8UL.jpg",
       alt: "Model wearing plain black basic tee.",
     },
     {
-      src: "https://tailwindui.com/plus/img/ecommerce-images/product-page-02-tertiary-product-shot-02.jpg",
+      src: "https://m.media-amazon.com/images/I/51gfVvBq90L._SX679_.jpg",
       alt: "Model wearing plain gray basic tee.",
     },
     {
-      src: "https://tailwindui.com/plus/img/ecommerce-images/product-page-02-featured-product-shot.jpg",
+      src: "https://m.media-amazon.com/images/I/41l1cfTylhL.jpg",
       alt: "Model wearing plain white basic tee.",
     },
   ],
@@ -62,13 +65,21 @@ function classNames(...classes) {
 }
 
 export default function ProductDetail() {
-
   const [selectedSize, setSelectedSize] = useState(product.sizes[2]);
+  const navigate = useNavigate();
+  const params = useParams();
+  const dispatch = useDispatch();
+  const { products } = useSelector(store => store);
 
- const navigate = useNavigate();
+  useEffect (() => {
+    dispatch(findProductsById(params.productId))  
+  },[params.productId])
+
   const handleAddToCart = () => {
-    navigate('/cart')
-  }
+    const data = {productId: params.productId, size:selectedSize.name}
+    dispatch(addItemToCart(data))
+    navigate("/cart");
+  };
 
   return (
     <div className="bg-white lg:px-20 ">
@@ -117,8 +128,9 @@ export default function ProductDetail() {
           <div className="flex flex-col items-center">
             <div className="overflow-hidden rounded-lg max-w-[30rem] max-h-[35rem]">
               <img
-                alt={product.images[0].alt}
-                src={product.images[0].src}
+                alt={product.images[0].src}
+                
+                src={products.product?.imageUrl}
                 className="hidden size-full rounded-lg object-cover lg:block"
               />
             </div>
@@ -137,10 +149,10 @@ export default function ProductDetail() {
           <div className="lg:col-span-1 max-w-2xl px-4 pb-16 sm:px-6 lg:max-w-7xl lg:px-8 lg:pb-24 ">
             <div className="lg:col-span-2">
               <h1 className="text-lg lg:text-xl font-semibold text-gray-900">
-                CB-COLEBROOK
+                {products.product?.brand}
               </h1>
               <h1 className="text-lg lg:text-xl text-gray-900 opacity-60 pt-1">
-                Men's Casual Button Down Shirts
+                {products.product?.title}
               </h1>
             </div>
 
@@ -148,9 +160,9 @@ export default function ProductDetail() {
             <div className="mt-4 lg:row-span-3 lg:mt-0">
               <h2 className="sr-only">Product information</h2>
               <div className="flex space-x-5 items-center text-lg lg:text-xl text-gray-900 mt-6">
-                <p className="font-semibold">₹199</p>
-                <p className="opacity-50 line-through">₹211</p>
-                <p className="text-green-600 font-semibold">5% off</p>
+                <p className="font-semibold">₹{products.product?.discountedPrice}</p>
+                <p className="opacity-50 line-through">₹{products.product?.price}</p>
+                <p className="text-green-600 font-semibold">{products.product?.discountPercent}% off</p>
               </div>
 
               {/* Reviews */}
@@ -223,10 +235,10 @@ export default function ProductDetail() {
                 </div>
 
                 <Button
-                onClick={handleAddToCart}
+                  onClick={handleAddToCart}
                   variant="contained"
                   color="secondary"
-                  sx={{ px: "2rem", py: "1rem", mt:3}}
+                  sx={{ px: "2rem", py: "1rem", mt: 3 }}
                 >
                   Add to cart
                 </Button>
@@ -280,72 +292,99 @@ export default function ProductDetail() {
             <Grid container spacing={7}>
               <Grid item xs={7}>
                 <div className="space-y-5">
-                 {[1,1,1].map((item)=> <ProductReviewCard />)}
+                  {[1, 1, 1].map((item) => (
+                    <ProductReviewCard />
+                  ))}
                 </div>
               </Grid>
 
               <Grid item xs={5}>
-                    <h1 className="text-xl font-semibold pb-2">Product Rating</h1>
+                <h1 className="text-xl font-semibold pb-2">Product Rating</h1>
 
-                    <div className="flex items-center space-x-3">
-                        <Rating value={4.5} precision={.5} readOnly ></Rating>
-                        <p className="opacity-60">4356 Ratings</p>
-                    </div>
+                <div className="flex items-center space-x-3">
+                  <Rating value={4.5} precision={0.5} readOnly></Rating>
+                  <p className="opacity-60">4356 Ratings</p>
+                </div>
 
-                    <Box className='mt-5 space-y-3'>
-                        <Grid container alignItems='center' gap={2}>
-                            <Grid item xs={2}>
-                                <p>Excellent</p>
-                            </Grid>
-                            <Grid item xs={7}>
-                                <LinearProgress sx={{bgcolor:'#d0d0d0', borderRadius:4, height:7}} variant="determinate" value={40} color="success" />
-                            </Grid>
-                        </Grid>
-                        <Grid container alignItems='center' gap={2}>
-                            <Grid item xs={2}>
-                                <p>Very Good</p>
-                            </Grid>
-                            <Grid item xs={7}>
-                                <LinearProgress sx={{bgcolor:'#d0d0d0', borderRadius:4, height:7}} variant="determinate" value={30} color="success" />
-                            </Grid>
-                        </Grid>
-                        <Grid container alignItems='center' gap={2}>
-                            <Grid item xs={2}>
-                                <p>Good</p>
-                            </Grid>
-                            <Grid item xs={7}>
-                                <LinearProgress sx={{bgcolor:'#d0d0d0', borderRadius:4, height:7}} variant="determinate" value={25} />
-                            </Grid>
-                        </Grid>
-                        <Grid container alignItems='center' gap={2}>
-                            <Grid item xs={2}>
-                                <p>Avrage</p>
-                            </Grid>
-                            <Grid item xs={7}>
-                                <LinearProgress sx={{bgcolor:'#d0d0d0', borderRadius:4, height:7}} variant="determinate" value={20} color="warning" />
-                            </Grid>
-                        </Grid>
-                        <Grid container alignItems='center' gap={2}>
-                            <Grid item xs={2}>
-                                <p>Poor</p>
-                            </Grid>
-                            <Grid item xs={7}>
-                                <LinearProgress sx={{bgcolor:'#d0d0d0', borderRadius:4, height:7}} variant="determinate" value={15} color="error" />
-                            </Grid>
-                        </Grid>
-                    </Box>
+                <Box className="mt-5 space-y-3">
+                  <Grid container alignItems="center" gap={2}>
+                    <Grid item xs={2}>
+                      <p>Excellent</p>
+                    </Grid>
+                    <Grid item xs={7}>
+                      <LinearProgress
+                        sx={{ bgcolor: "#d0d0d0", borderRadius: 4, height: 7 }}
+                        variant="determinate"
+                        value={40}
+                        color="success"
+                      />
+                    </Grid>
+                  </Grid>
+                  <Grid container alignItems="center" gap={2}>
+                    <Grid item xs={2}>
+                      <p>Very Good</p>
+                    </Grid>
+                    <Grid item xs={7}>
+                      <LinearProgress
+                        sx={{ bgcolor: "#d0d0d0", borderRadius: 4, height: 7 }}
+                        variant="determinate"
+                        value={30}
+                        color="success"
+                      />
+                    </Grid>
+                  </Grid>
+                  <Grid container alignItems="center" gap={2}>
+                    <Grid item xs={2}>
+                      <p>Good</p>
+                    </Grid>
+                    <Grid item xs={7}>
+                      <LinearProgress
+                        sx={{ bgcolor: "#d0d0d0", borderRadius: 4, height: 7 }}
+                        variant="determinate"
+                        value={25}
+                      />
+                    </Grid>
+                  </Grid>
+                  <Grid container alignItems="center" gap={2}>
+                    <Grid item xs={2}>
+                      <p>Avrage</p>
+                    </Grid>
+                    <Grid item xs={7}>
+                      <LinearProgress
+                        sx={{ bgcolor: "#d0d0d0", borderRadius: 4, height: 7 }}
+                        variant="determinate"
+                        value={20}
+                        color="warning"
+                      />
+                    </Grid>
+                  </Grid>
+                  <Grid container alignItems="center" gap={2}>
+                    <Grid item xs={2}>
+                      <p>Poor</p>
+                    </Grid>
+                    <Grid item xs={7}>
+                      <LinearProgress
+                        sx={{ bgcolor: "#d0d0d0", borderRadius: 4, height: 7 }}
+                        variant="determinate"
+                        value={15}
+                        color="error"
+                      />
+                    </Grid>
+                  </Grid>
+                </Box>
               </Grid>
             </Grid>
           </div>
         </section>
 
-
-{/* Similar Products */}
-        <section className="pt-10">   
-            <h1 className="py-5 text-xl font-bold">Similar Products</h1>
-            <div className="flex flex-wrap space-y-5 px-3">
-                    {mens_kurta.map((item) => <HomeSectionCard product={item}/> )}
-            </div>
+        {/* Similar Products */}
+        <section className="pt-10">
+          <h1 className="py-5 text-xl font-bold">Similar Products</h1>
+          <div className="flex flex-wrap space-y-5 px-3">
+            {mens_kurta.map((item) => (
+              <HomeSectionCard product={item} />
+            ))}
+          </div>
         </section>
       </div>
     </div>

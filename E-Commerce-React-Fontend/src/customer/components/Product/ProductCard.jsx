@@ -7,11 +7,11 @@ const ProductCard = ({ product }) => {
   const navigate = useNavigate();
 
   return (
-    <div onClick={() => navigate(`/product/${5}`)} className="product-card w-[15rem] m-3 transition-all cursor-pointer">
-      <div className="h-[20rem] w-full object-cover object-left-top ">
-        <img
-          src="https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTV0Ri3YQb1NfObSEKtwKavdYXLtDFLpm_9Th3FR068a-hXu9H0bl3OcpURTG9lZoVbFGckPkYaatonriDuZQJPQLhkviYPk71ZHid0ncFYClNkMq0rsbrB_A"
-          alt=""
+    <div onClick={() => navigate(`/product/${product._id}`)} className="bg-white product-card w-[15rem] m-3 transition-all cursor-pointer">
+      <div className="h-[20rem] my-3 w-full object-cover object-left-top flex justify-center">
+        <img className="h-[20rem]"
+          src={product.imageUrl}
+          alt="" 
         />
       </div>
 

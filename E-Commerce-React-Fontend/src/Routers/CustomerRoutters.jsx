@@ -16,16 +16,18 @@ const CustomerRoutters = () => {
       <div>
         <Navigation />
       </div>
-      
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/:lavelOne/:lavelTwo/:lavelThree" element={<Product />} />
-          <Route path="/product/:productId" element={<ProductDetail />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/account/order" element={<Order />} />
-          <Route path="/account/order/:orderId" element={<OrderDetail />} />
-        </Routes>
+
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<HomePage />} />
+        <Route path="/register" element={<HomePage />} />
+        <Route path="/:lavelOne/:lavelTwo/:lavelThree" element={<Product />} />
+        <Route path="/product/:productId" element={<ProductDetail />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/account/order" element={<Order />} />
+        <Route path="/account/order/:orderId" element={<OrderDetail />} />
+      </Routes>
 
       <div>
         <Footer />

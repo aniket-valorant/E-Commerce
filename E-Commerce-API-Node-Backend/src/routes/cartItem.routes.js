@@ -8,4 +8,4 @@ router.put("/:id", authenticate , cartItemController.updateCartItem);
 router.delete("/:id", authenticate , cartItemController.removeCartItem);
 
 
-module.exports = router;
+module.exports = router; 
